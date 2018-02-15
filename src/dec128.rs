@@ -726,6 +726,36 @@ impl d128 {
         d128::with_context(|ctx| unsafe { *decQuadScaleB(&mut self, &self, other.as_ref(), ctx) })
     }
 
+    /// This calculates the greatest common divisor for `self` and the given operand.
+    pub fn gcd<O: AsRef<d128>>(self, other: O) -> d128 {
+        if self.is_zero() || other.as_ref().is_zero() {
+            return Self::zero();
+        } else if self.is_negative() || other.as_ref().is_negative() {
+            return d128!(-1);
+        }
+
+        let mut m = self;
+        let mut n = *other.as_ref();
+        loop {
+            let r = m % n;
+            if r.is_zero() {
+                break;
+            }
+
+            m = n;
+            n = r;
+        }
+
+        n
+    }
+
+    /// This calculates the least common multiple for `self` and the given operand.
+    pub fn lcm<O: AsRef<d128>>(self, other: O) -> d128 {
+        let other = other.as_ref();
+        let gcd = self.gcd(other);
+        self * other / gcd
+    }
+
     // Comparisons.
 
     /// Compares `self` and `other` numerically and returns the result. The result may be –1, 0, 1,
@@ -1132,5 +1162,15 @@ mod tests {
         assert_eq!(d128!(10), decimals.iter().sum());
 
         assert_eq!(d128!(10), decimals.into_iter().sum());
+    }
+
+    #[test]
+    fn test_gcd() {
+        assert_eq!(d128!(10).gcd(d128!(3)), d128!(1));
+    }
+
+    #[test]
+    fn test_lcm() {
+        assert_eq!(d128!(10).lcm(d128!(3)), d128!(30));
     }
 }
