@@ -749,6 +749,13 @@ impl d128 {
         n
     }
 
+    /// This calculates the least common multiple for `self` and the given operand.
+    pub fn lcm<O: AsRef<d128>>(self, other: O) -> d128 {
+        let other = other.as_ref();
+        let gcd = self.gcd(other);
+        self * other / gcd
+    }
+
     // Comparisons.
 
     /// Compares `self` and `other` numerically and returns the result. The result may be –1, 0, 1,
@@ -1160,5 +1167,10 @@ mod tests {
     #[test]
     fn test_gcd() {
         assert_eq!(d128!(10).gcd(d128!(3)), d128!(1));
+    }
+
+    #[test]
+    fn test_lcm() {
+        assert_eq!(d128!(10).lcm(d128!(3)), d128!(30));
     }
 }
